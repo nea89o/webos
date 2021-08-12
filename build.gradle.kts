@@ -1,6 +1,6 @@
 plugins {
 	kotlin("multiplatform") version "1.5.21"
-	//id("io.kotest.multiplatform") version "5.0.0.3"
+	id("io.kotest.multiplatform") version "5.0.0.3"
 }
 
 repositories {
@@ -14,7 +14,7 @@ kotlin {
 	targets {
 		js(IR) {
 			nodejs { }
-			browser { }
+			browser { testTask { useMocha() } }
 		}
 	}
 	sourceSets {
@@ -23,9 +23,9 @@ kotlin {
 		}
 		val jsTest by getting {
 			dependencies {
-				implementation("io.kotest:kotest-assertions-core:4.6.1")
-				implementation("io.kotest:kotest-framework-api:4.6.1")
-				implementation("io.kotest:kotest-framework-engine:4.6.1")
+				implementation("io.kotest:kotest-assertions-core:5.0.0.376-SNAPSHOT")
+				implementation("io.kotest:kotest-framework-api:5.0.0.376-SNAPSHOT")
+				implementation("io.kotest:kotest-framework-engine:5.0.0.376-SNAPSHOT")
 			}
 		}
 	}

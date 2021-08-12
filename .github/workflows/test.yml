@@ -13,28 +13,13 @@ jobs:
                 uses: actions/setup-java@v1
                 with:
                     java-version: 16
-            -   name: Get Allure history
-                uses: actions/checkout@v2
-                if: always()
-                continue-on-error: true
-                with:
-                    ref: gh-pages
-                    path: gh-pages
             -   name: Run Gradle Tests
-                run: ./gradlew jsNodeTest --stacktrace
-            -   name: Generate Allure Report
-                if: always()
-                uses: simple-elf/allure-report-action@master
-                with:
-                    allure_results: build/test-results/jsNodeTest
-                    allure_history: allure-history
-
-
+                run: ./gradlew jsTest --stacktrace
             -   name: Deploy report to Github Pages
                 if: always()
                 uses: peaceiris/actions-gh-pages@v2
                 env:
                     PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     PUBLISH_BRANCH: gh-pages
-                    PUBLISH_DIR: allure-history
+                    PUBLISH_DIR: build/reports/test/jsTest
 
