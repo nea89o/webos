@@ -1,0 +1,22 @@
+{
+  "uid" : "98d3104e051c652961429bf95fa0b5d6",
+  "children" : [ {
+    "name" : "io.PathTest",
+    "children" : [ {
+      "name" : "kotestJavascript[js, node]",
+      "uid" : "e7b98326544f5ddc",
+      "parentUid" : "30bd379eb1eccf2e81788bae4c8fb388",
+      "status" : "passed",
+      "time" : {
+        "start" : 1628809725000,
+        "stop" : 1628809725005,
+        "duration" : 5
+      },
+      "flaky" : false,
+      "newFailed" : false,
+      "parameters" : [ ]
+    } ],
+    "uid" : "30bd379eb1eccf2e81788bae4c8fb388"
+  } ],
+  "name" : "suites"
+}

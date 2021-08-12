@@ -1,0 +1,11 @@
+[ {
+  "uid" : "e7b98326544f5ddc",
+  "name" : "kotestJavascript[js, node]",
+  "time" : {
+    "start" : 1628809725000,
+    "stop" : 1628809725005,
+    "duration" : 5
+  },
+  "status" : "passed",
+  "severity" : "normal"
+} ]

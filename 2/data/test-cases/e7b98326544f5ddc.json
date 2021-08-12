@@ -1,0 +1,52 @@
+{
+  "uid" : "e7b98326544f5ddc",
+  "name" : "kotestJavascript[js, node]",
+  "historyId" : "io.PathTest:io.PathTest#kotestJavascript[js, node]",
+  "time" : {
+    "start" : 1628809725000,
+    "stop" : 1628809725005,
+    "duration" : 5
+  },
+  "status" : "passed",
+  "flaky" : false,
+  "newFailed" : false,
+  "beforeStages" : [ ],
+  "testStage" : {
+    "steps" : [ ],
+    "attachments" : [ ],
+    "parameters" : [ ],
+    "stepsCount" : 0,
+    "attachmentsCount" : 0,
+    "shouldDisplayMessage" : false,
+    "hasContent" : false
+  },
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "resultFormat",
+    "value" : "junit"
+  }, {
+    "name" : "suite",
+    "value" : "io.PathTest"
+  }, {
+    "name" : "host",
+    "value" : "fv-az213-285"
+  }, {
+    "name" : "testClass",
+    "value" : "io.PathTest"
+  }, {
+    "name" : "package",
+    "value" : "io.PathTest"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ ],
+    "categories" : [ ],
+    "tags" : [ ]
+  },
+  "source" : "e7b98326544f5ddc.json",
+  "parameterValues" : [ ]
+}
