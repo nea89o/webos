@@ -1,12 +1,14 @@
 package io
 
-sealed interface Path {
-	val parts: List<String>
+sealed class Path {
+	abstract val parts: List<String>
 	fun toAbsolutePath(relativeTo: Absolute): Absolute {
 		return relativeTo.resolve(this)
 	}
 
-	fun resolve(path: Path): Path
+	abstract fun resolve(path: Path): Path
+
+	abstract val stringPath: String
 
 	companion object {
 		val root = Absolute(listOf())
@@ -38,18 +40,22 @@ sealed interface Path {
 		}
 	}
 
-	data class Relative internal constructor(override val parts: List<String>) : Path {
+	data class Relative internal constructor(override val parts: List<String>) : Path() {
 		override fun resolve(path: Path): Path {
 			if (path is Absolute) return path
 			return Relative(this.parts + path.parts)
 		}
+
+		override val stringPath: String get() = parts.joinToString("/")
 	}
 
-	data class Absolute internal constructor(override val parts: List<String>) : Path {
+	data class Absolute internal constructor(override val parts: List<String>) : Path() {
 		override fun resolve(path: Path): Absolute {
 			if (path is Absolute) return path
 			return Absolute(this.parts + path.parts)
 		}
+
+		override val stringPath: String get() = "/" + parts.joinToString("/")
 
 		fun relativize(path: Path): Relative = when (path) {
 			is Relative -> path
@@ -72,4 +78,6 @@ sealed interface Path {
 			}
 		}
 	}
+
+	override fun toString(): String = "Path($stringPath)"
 }
