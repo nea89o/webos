@@ -1,7 +1,7 @@
 package io
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.types.shouldBeTypeOf
 
 class PathTest : FunSpec({
@@ -16,7 +16,7 @@ class PathTest : FunSpec({
 			Path.ofShell("a", "b", userHome = homeDir),
 			Path.ofShell(listOf("a", "b"), userHome = homeDir),
 		).forEach {
-			it.shouldBeTypeOf<Path.Relative>()
+			assertSoftly(it) { shouldBeTypeOf<Path.Relative>() }
 		}
 	}
 	test("recognize absolute paths as such") {
@@ -25,7 +25,7 @@ class PathTest : FunSpec({
 			Path.of("/"),
 			Path.ofShell("/b/c", userHome = homeDir),
 		).forEach {
-			it.shouldBeTypeOf<Path.Absolute>()
+			assertSoftly(it) { shouldBeTypeOf<Path.Absolute>() }
 		}
 	}
 })

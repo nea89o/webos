@@ -68,7 +68,7 @@ sealed interface Path {
 					}
 					partList.add(part)
 				}
-				Relative(List(returns) { "" } + partList)
+				Relative(List(returns) { ".." } + partList)
 			}
 		}
 	}

@@ -1,5 +1,7 @@
-import io.IOHandler
+import io.FileService
 import io.Path
+import io.PrimitiveFileService
+import io.PrimitiveINode
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.Element
@@ -69,7 +71,7 @@ class Console(val os: WebOS, val renderElement: Element?) {
 class WebOS {
 	private val _consoles = mutableListOf<Console>()
 	val consoles get() = _consoles.toList()
-	val files = IOHandler()
+	val files: FileService<PrimitiveINode> = PrimitiveFileService()
 	fun registerConsole(element: Element) {
 		_consoles.add(Console(this, element))
 	}
@@ -77,6 +79,6 @@ class WebOS {
 
 data class User(
 	val name: String,
-	val homeDirectory: Path.Absolute
+	val homeDirectory: Path.Absolute,
+	val isRoot: Boolean = false,
 )
-
