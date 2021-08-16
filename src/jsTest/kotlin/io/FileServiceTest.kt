@@ -12,6 +12,7 @@ class FileServiceTest : FunSpec({
 
 fun <INode> FunSpec.generateTests(name: String, provider: () -> FileService<INode>) {
 	val aPath = Path.of("/a") as Path.Absolute
+	val bPath = Path.of("/a/b") as Path.Absolute
 	val homePath = Path.of("/roothome") as Path.Absolute
 	val dataA = "a".encodeToByteArray()
 	val rootUser = User("root", homePath, true)
@@ -19,6 +20,7 @@ fun <INode> FunSpec.generateTests(name: String, provider: () -> FileService<INod
 		val fileService = provider()
 		val rootInode = fileService.getINode(Path.root)
 		assertTrue(fileService.exists(rootInode))
+		assertEquals(fileService.getPath(rootInode), Path.root)
 	}
 	test("$name: CRUD a file") {
 		val fileService = provider()
@@ -38,5 +40,20 @@ fun <INode> FunSpec.generateTests(name: String, provider: () -> FileService<INod
 		assertFalse(fileService.isFile(aInode))
 		assertFalse(fileService.exists(aInode))
 	}
-
+	test("$name: CRUD a directory structure") {
+		val fileService = provider()
+		val aINode = fileService.getINode(aPath)
+		val bINode = fileService.getINode(bPath)
+		assertFalse(fileService.exists(aINode))
+		assertFalse(fileService.exists(bINode))
+		assertEquals(fileService.createDirectory(aINode, rootUser), CreateFileResult.Created)
+		assertEquals(fileService.createFile(bINode, rootUser), CreateFileResult.Created)
+		assertTrue(fileService.exists(aINode))
+		assertTrue(fileService.exists(bINode))
+		assertEquals(fileService.writeToFile(bINode, rootUser, dataA), WriteFileResult.Written)
+		assertEquals(fileService.readFromFile(bINode, rootUser), ReadFileResult.Read(dataA))
+		assertEquals(fileService.deleteFile(aINode, rootUser), DeleteFileResult.Deleted)
+		assertFalse(fileService.exists(bINode))
+		assertFalse(fileService.exists(aINode))
+	}
 }
