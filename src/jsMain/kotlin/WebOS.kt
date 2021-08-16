@@ -91,6 +91,7 @@ sealed class Key {
 	object Finish : Key()
 	object Help : Key()
 	class Printable(val char: Char) : Key()
+	class FunctionN(val n: Int) : Key()
 	companion object {
 		fun from(string: String) = when (string) {
 			"Alt" -> Alt
@@ -138,7 +139,11 @@ sealed class Key {
 			"Find" -> Find
 			"Finish" -> Finish
 			"Help" -> Help
-			else -> if (string.length == 1) Printable(string.first()) else throw TODO()
+			else -> if (string.length == 1)
+				Printable(string.first())
+			else if (string.first() == 'F')
+				FunctionN(string.substring(1).toInt())
+			else throw TODO()
 		}
 	}
 }
