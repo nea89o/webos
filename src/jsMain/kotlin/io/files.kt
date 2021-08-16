@@ -175,7 +175,7 @@ class PrimitiveFileService : FileService<PrimitiveINode> {
 		if (storageBlobs.containsKey(iNode.internalPath)) return CreateFileResult.Failure.AlreadyExists
 		val parent = getStorageBlob(resolve(iNode, ".."))
 		if (parent !is PrimitiveStorageBlob.Directory) return CreateFileResult.Failure.NoParent
-		if (hasPermission(user, parent) { write }) return CreateFileResult.Failure.NoPermission
+		if (!hasPermission(user, parent) { write }) return CreateFileResult.Failure.NoPermission
 		return null
 	}
 

@@ -1,6 +1,7 @@
 plugins {
 	kotlin("multiplatform") version "1.5.21"
 	id("io.kotest.multiplatform") version "5.0.0.3"
+	id("com.bnorm.power.kotlin-power-assert") version "0.10.0"
 }
 
 repositories {
@@ -10,6 +11,10 @@ repositories {
 
 val kotestVersion: String by project
 
+configure<com.bnorm.power.PowerAssertGradleExtension> {
+	functions = listOf("kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertFalse", "kotlin.test.assertEquals")
+}
+
 kotlin {
 	targets {
 		js(IR) {
@@ -18,7 +23,8 @@ kotlin {
 				webpackTask {
 					output.libraryTarget = "umd"
 				}
-				testTask { useMocha() } }
+				testTask { useMocha() }
+			}
 		}
 	}
 	sourceSets {
