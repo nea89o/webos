@@ -90,4 +90,15 @@ class PathTest : FunSpec({
 			}
 		}
 	}
+	test("relaitivization works") {
+		forAll(
+			row("/a/b", "/a", ".."),
+			row("/a", "/a/b", "b"),
+			row("/a/b", "/a/c", "../c"),
+		) { a, b, c ->
+			assertSoftly {
+				Path.of(a).shouldBeTypeOf<Path.Absolute>().relativize(Path.of(b)) shouldBe Path.of(c)
+			}
+		}
+	}
 })

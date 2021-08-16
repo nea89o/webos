@@ -14,7 +14,11 @@ kotlin {
 	targets {
 		js(IR) {
 			nodejs { }
-			browser { testTask { useMocha() } }
+			browser {
+				webpackTask {
+					output.libraryTarget = "umd"
+				}
+				testTask { useMocha() } }
 		}
 	}
 	sourceSets {

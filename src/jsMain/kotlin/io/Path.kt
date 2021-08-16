@@ -60,21 +60,16 @@ sealed class Path {
 		fun relativize(path: Path): Relative = when (path) {
 			is Relative -> path
 			is Absolute -> {
-				var commonPrefix = true
-				val partList = mutableListOf<String>()
-				var returns = 0
-				for ((idx, part) in path.parts.withIndex()) {
-					if (idx < this.parts.size) {
-						if (this.parts[idx] == part && commonPrefix) {
-							continue
-						} else {
-							commonPrefix = false
-							returns++
-						}
-					}
-					partList.add(part)
+				var idx = 0
+				while (idx < path.parts.size && idx < parts.size && path.parts[idx] == parts[idx]) {
+					idx++
 				}
-				Relative(List(returns) { ".." } + partList)
+				val returns = if (idx < parts.size) {
+					parts.size - idx
+				} else {
+					0
+				}
+				Relative(List(returns) { ".." } + path.parts.subList(idx, path.parts.size))
 			}
 		}
 	}
