@@ -9,6 +9,7 @@ import org.w3c.dom.Node
 import org.w3c.dom.asList
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
+import kotlin.properties.Delegates
 
 fun main() {
 	console.log("Hello from Kotlin")
@@ -24,22 +25,83 @@ fun main() {
 data class CharacterRun(val text: String, val color: String)
 
 abstract class Activity(val console: Console) {
+
+	open fun handleKeyPress(key: Key) {}
+	open fun update() {}
 	abstract fun render(columns: Int, rows: Int): List<List<CharacterRun>>
 }
 
-class PrimitiveShell(override val console: Console) : Shell {
+class ShellRunner(console: Console) : Activity(console) {
 
-	var currentInput = ""
+	val history = mutableListOf<String>()
 
-	override fun start() {
-		console.print("${console.currentUser!!.name}@${console.os.hostname} ${console.workingDirectory} > ")
+	val shellProgramStack = ArrayDeque<ShellProgram>()
+
+	var lastLine = ""
+
+	fun newLine() {
+		history.add(lastLine)
+		lastLine = ""
+		console.invalidateRender()
 	}
+
+	fun println(it: String = "") {
+		print(it)
+		newLine()
+	}
+
+	fun print(it: String) {
+		lastLine += it
+		console.invalidateRender()
+	}
+
+	override fun update() {
+		shellProgramStack.lastOrNull()?.update()
+	}
+
+	fun getInput(): String? {
+		if (inputBuffer.contains("\n")) {
+			val r = inputBuffer.substringBefore("\n")
+			inputBuffer = inputBuffer.substringAfter("\n")
+			return r
+		}
+		return null
+	}
+
+	override fun render(columns: Int, rows: Int): List<List<CharacterRun>> =
+		history.map { listOf(CharacterRun(it.take(columns), "white")) }.takeLast(rows - 1) + listOf(
+			listOf(
+				CharacterRun(
+					lastLine + inputBuffer,
+					"white"
+				)
+			)
+		)
+
+	var inputBuffer = ""
 
 	override fun handleKeyPress(key: Key) = when (key) {
-		is Key.Printable -> { currentInput += key.char }
-		else -> Unit
+		is Key.Printable -> {
+			inputBuffer += key.char
+		}
+		is Key.Enter     -> {
+			inputBuffer += "\n"
+		}
+		else             -> Unit
 	}
 
+	fun <T : ShellProgram> openShellProgram(program: (ShellRunner) -> T): ShellRunner = openShellProgram(program(this))
+
+	fun <T : ShellProgram> openShellProgram(program: T): ShellRunner {
+		shellProgramStack.addLast(program)
+		return this
+	}
+
+}
+
+abstract class ShellProgram(val shellRunner: ShellRunner) {
+
+	abstract fun update(): Unit
 }
 
 sealed class Key {
@@ -64,6 +126,7 @@ sealed class Key {
 		object Right : Key()
 		object Up : Key()
 	}
+
 	object End : Key()
 	object Home : Key()
 	object PageUp : Key()
@@ -93,53 +156,54 @@ sealed class Key {
 	class Printable(val char: Char) : Key()
 	class FunctionN(val n: Int) : Key()
 	companion object {
+
 		fun from(string: String) = when (string) {
-			"Alt" -> Alt
-			"AltGraph" -> AltGraph
-			"CapsLock" -> CapsLock
-			"Control" -> Control
-			"Fn" -> Function
-			"FnLock" -> FunctionLock
-			"Hyper" -> Hyper
-			"Meta" -> Meta
-			"NumLock" -> NumLock
-			"Shift" -> Shift
-			"Super" -> Super
-			"Symbol" -> Symbol
-			"SymbolLock" -> SymbolLock
-			"Enter" -> Enter
-			"Tab" -> Tab
-			"Down" -> Arrow.Down
-			"Left" -> Arrow.Left
-			"Right" -> Arrow.Right
-			"Up" -> Arrow.Up
-			"End" -> End
-			"Home" -> Home
-			"PageUp" -> PageUp
-			"PageDown" -> PageDown
-			"Backspace" -> Backspace
-			"Clear" -> Clear
-			"Copy" -> Copy
-			"CrSel" -> CrSel
-			"Cut" -> Cut
-			"Delete" -> Delete
-			"EraseEof" -> EraseEof
-			"ExSel" -> ExSel
-			"Insert" -> Insert
-			"Paste" -> Paste
-			"Redo" -> Redo
-			"Undo" -> Undo
-			"Accept" -> Accept
-			"Again" -> Again
-			"Attn" -> Attn
-			"Cancel" -> Cancel
+			"Alt"         -> Alt
+			"AltGraph"    -> AltGraph
+			"CapsLock"    -> CapsLock
+			"Control"     -> Control
+			"Fn"          -> Function
+			"FnLock"      -> FunctionLock
+			"Hyper"       -> Hyper
+			"Meta"        -> Meta
+			"NumLock"     -> NumLock
+			"Shift"       -> Shift
+			"Super"       -> Super
+			"Symbol"      -> Symbol
+			"SymbolLock"  -> SymbolLock
+			"Enter"       -> Enter
+			"Tab"         -> Tab
+			"Down"        -> Arrow.Down
+			"Left"        -> Arrow.Left
+			"Right"       -> Arrow.Right
+			"Up"          -> Arrow.Up
+			"End"         -> End
+			"Home"        -> Home
+			"PageUp"      -> PageUp
+			"PageDown"    -> PageDown
+			"Backspace"   -> Backspace
+			"Clear"       -> Clear
+			"Copy"        -> Copy
+			"CrSel"       -> CrSel
+			"Cut"         -> Cut
+			"Delete"      -> Delete
+			"EraseEof"    -> EraseEof
+			"ExSel"       -> ExSel
+			"Insert"      -> Insert
+			"Paste"       -> Paste
+			"Redo"        -> Redo
+			"Undo"        -> Undo
+			"Accept"      -> Accept
+			"Again"       -> Again
+			"Attn"        -> Attn
+			"Cancel"      -> Cancel
 			"ContextMenu" -> ContextMenu
-			"Escape" -> Escape
-			"Execute" -> Execute
-			"Find" -> Find
-			"Finish" -> Finish
-			"Help" -> Help
-			else -> if (string.length == 1)
+			"Escape"      -> Escape
+			"Execute"     -> Execute
+			"Find"        -> Find
+			"Finish"      -> Finish
+			"Help"        -> Help
+			else          -> if (string.length == 1)
 				Printable(string.first())
 			else if (string.first() == 'F')
 				FunctionN(string.substring(1).toInt())
@@ -148,15 +212,45 @@ sealed class Key {
 	}
 }
 
-interface Shell {
-	val console: Console
-	fun start()
-	fun handleKeyPress(key: Key)
+class Login(shellRunner: ShellRunner) : ShellProgram(shellRunner) {
+
+	override fun update() {
+		while (true)
+			when (state) {
+				0 -> {
+					shellRunner.print("Username: ")
+					state = 1
+				}
+				1 -> {
+					val inp = shellRunner.getInput() ?: return
+					shellRunner.println(inp)
+					shellRunner.print("Password: ")
+					username = inp
+					state = 2
+				}
+				2 -> {
+					val inp = shellRunner.getInput() ?: return
+					shellRunner.println(inp)
+					shellRunner.println("Login complete)")
+					password = inp
+					// TODO: check password and set user
+					state = 3
+				}
+				3 -> {
+					TODO()
+				}
+			}
+
+	}
+
+	var state = 0
+	var username = ""
+	var password = ""
+
 }
 
-typealias KeypressHandler = (Key) -> Unit
-
 class Console(val os: WebOS, val renderElement: Element?) {
+
 	val isVirtual get() = renderElement == null
 	val activityStack = ArrayDeque<Activity>()
 
@@ -176,31 +270,33 @@ class Console(val os: WebOS, val renderElement: Element?) {
 		}
 
 	init {
-	    renderElement?.addEventListener("keypress", ::computeKeypressEvent)
+		renderElement?.addEventListener("keydown", ::computeKeypressEvent)
 	}
-
-	var keypressHandler: KeypressHandler? = null
 
 	fun computeKeypressEvent(event: Event) {
 		if (!isInFocus()) return
 		if (event !is KeyboardEvent) return
-		keypressHandler?.invoke(Key.from(event.key))
+		activityStack.lastOrNull()?.handleKeyPress(Key.from(event.key))
 	}
 
 	private fun isInFocus(): Boolean = renderElement.containsOrIs(document.activeElement)
 
 	private fun Node?.containsOrIs(node: Node?) = this == node || this?.contains(node) ?: false
 
-	fun openActivity(activity: Activity) {
+	fun <T : Activity> openActivity(activity: (Console) -> T): Console = openActivity(activity(this))
+
+	fun <T : Activity> openActivity(activity: T): Console {
 		activityStack.addLast(activity)
 		invalidateRender()
+		return this
 	}
 
 	fun render() {
 		if (renderElement == null) return
 		if (!shouldRerender) return
 		shouldRerender = false
-		activityStack.last()
+		val x = activityStack.lastOrNull()?.render(columns, rows)
+		console.log(x)
 	}
 
 	fun invalidateRender() {
@@ -214,39 +310,25 @@ class Console(val os: WebOS, val renderElement: Element?) {
 
 	// TODO: Handle resizes of the renderElement
 
-	fun print(text: String): Unit = TODO()
-
-	fun loginAndThen(block: () -> Unit) {
-		print("Username: ")
-		var enteredUsername: Boolean = false
-		var username = ""
-		var password = ""
-		keypressHandler = handler@{
-			if (it is Key.Enter)
-				if (enteredUsername) {
-					//TODO: Login
-					block()
-					return@handler
-				} else {
-					enteredUsername = true
-					print("Password: ")
-				}
-			if (it !is Key.Printable) return@handler
-			if (!enteredUsername) username += it.char else password += it.char
-			print(it.char)
-		}
+	fun update(): Unit {
+		activityStack.lastOrNull()?.update()
 	}
 
-	fun start() = loginAndThen {
-		val shell = PrimitiveShell(this) //TODO: choose shell properly
-		keypressHandler = shell::handleKeyPress
-		shell.start()
+	var updateInterval by Delegates.notNull<Int>()
+
+	fun start(): Console {
+		updateInterval = window.setInterval(::update, 10)
+		return openActivity(ShellRunner(this).also { it.openShellProgram(Login(it)) })
 	}
 
+	fun destroy() {
+		window.clearInterval(updateInterval)
+	}
 
 }
 
 class WebOS {
+
 	val hostname: String = "host"
 	private val _consoles = mutableListOf<Console>()
 	val consoles get() = _consoles.toList()
