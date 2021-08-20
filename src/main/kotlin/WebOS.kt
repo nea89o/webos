@@ -13,6 +13,27 @@ import kotlin.properties.Delegates
 
 fun main() {
 	console.log("Hello from Kotlin")
+
+	val runner = IORunner.runOnIO {
+		println("ON START")
+		wait()
+		println("WAIT CALLED ONCE")
+		val x = getOneKey()
+		println("INPUT GET: $x")
+		println("EXITING NOW")
+	}
+	println("runOnIO called -> CALLING WHATEVER")
+	runner._CALLED_BY_JS_onWhatever()
+	println("CALLED WHATEVER -> CALLING INPUT")
+	runner._CALLED_BY_JS_onInput(window.prompt("INPUT") ?: "NO INPUT")
+	println("CALLED INPUT")
+	return
+
+
+
+
+
+
 	val webos = WebOS()
 	document.body?.addEventListener("load", {
 		document.body?.querySelectorAll(".webosconsole")?.asList()?.forEach {
@@ -84,10 +105,10 @@ class ShellRunner(console: Console) : Activity(console) {
 		is Key.Printable -> {
 			inputBuffer += key.char
 		}
-		is Key.Enter     -> {
+		is Key.Enter -> {
 			inputBuffer += "\n"
 		}
-		else             -> Unit
+		else -> Unit
 	}
 
 	fun <T : ShellProgram> openShellProgram(program: (ShellRunner) -> T): ShellRunner = openShellProgram(program(this))
@@ -158,52 +179,52 @@ sealed class Key {
 	companion object {
 
 		fun from(string: String) = when (string) {
-			"Alt"         -> Alt
-			"AltGraph"    -> AltGraph
-			"CapsLock"    -> CapsLock
-			"Control"     -> Control
-			"Fn"          -> Function
-			"FnLock"      -> FunctionLock
-			"Hyper"       -> Hyper
-			"Meta"        -> Meta
-			"NumLock"     -> NumLock
-			"Shift"       -> Shift
-			"Super"       -> Super
-			"Symbol"      -> Symbol
-			"SymbolLock"  -> SymbolLock
-			"Enter"       -> Enter
-			"Tab"         -> Tab
-			"Down"        -> Arrow.Down
-			"Left"        -> Arrow.Left
-			"Right"       -> Arrow.Right
-			"Up"          -> Arrow.Up
-			"End"         -> End
-			"Home"        -> Home
-			"PageUp"      -> PageUp
-			"PageDown"    -> PageDown
-			"Backspace"   -> Backspace
-			"Clear"       -> Clear
-			"Copy"        -> Copy
-			"CrSel"       -> CrSel
-			"Cut"         -> Cut
-			"Delete"      -> Delete
-			"EraseEof"    -> EraseEof
-			"ExSel"       -> ExSel
-			"Insert"      -> Insert
-			"Paste"       -> Paste
-			"Redo"        -> Redo
-			"Undo"        -> Undo
-			"Accept"      -> Accept
-			"Again"       -> Again
-			"Attn"        -> Attn
-			"Cancel"      -> Cancel
+			"Alt" -> Alt
+			"AltGraph" -> AltGraph
+			"CapsLock" -> CapsLock
+			"Control" -> Control
+			"Fn" -> Function
+			"FnLock" -> FunctionLock
+			"Hyper" -> Hyper
+			"Meta" -> Meta
+			"NumLock" -> NumLock
+			"Shift" -> Shift
+			"Super" -> Super
+			"Symbol" -> Symbol
+			"SymbolLock" -> SymbolLock
+			"Enter" -> Enter
+			"Tab" -> Tab
+			"Down" -> Arrow.Down
+			"Left" -> Arrow.Left
+			"Right" -> Arrow.Right
+			"Up" -> Arrow.Up
+			"End" -> End
+			"Home" -> Home
+			"PageUp" -> PageUp
+			"PageDown" -> PageDown
+			"Backspace" -> Backspace
+			"Clear" -> Clear
+			"Copy" -> Copy
+			"CrSel" -> CrSel
+			"Cut" -> Cut
+			"Delete" -> Delete
+			"EraseEof" -> EraseEof
+			"ExSel" -> ExSel
+			"Insert" -> Insert
+			"Paste" -> Paste
+			"Redo" -> Redo
+			"Undo" -> Undo
+			"Accept" -> Accept
+			"Again" -> Again
+			"Attn" -> Attn
+			"Cancel" -> Cancel
 			"ContextMenu" -> ContextMenu
-			"Escape"      -> Escape
-			"Execute"     -> Execute
-			"Find"        -> Find
-			"Finish"      -> Finish
-			"Help"        -> Help
-			else          -> if (string.length == 1)
+			"Escape" -> Escape
+			"Execute" -> Execute
+			"Find" -> Find
+			"Finish" -> Finish
+			"Help" -> Help
+			else -> if (string.length == 1)
 				Printable(string.first())
 			else if (string.first() == 'F')
 				FunctionN(string.substring(1).toInt())
